@@ -2,8 +2,10 @@
 build:centos8:
   image: alazartech/centos8:2.1.0
   script:
+    - conan remote remove bincrafters
+    - yum install -y sudo
     - cd recipes/qt/6.x.x
-    - conan create . qt/6.2.2@alazar/stable --build missing -s ${BUILD_TYPE} -o qt:shared=True
+    - CONAN_SYSREQUIRES_MODE=enabled conan create . qt/6.2.2@alazar/stable --build missing -s ${BUILD_TYPE} -o qt:shared=True
     - conan upload qt/6.2.2@alazar/stable -r ottawa
   parallel:
     matrix:
@@ -14,8 +16,10 @@ build:centos8:
 build:ubuntu20.04:
   image: alazartech/centos8:2.1.0
   script:
+    - conan remote remove bincrafters
+    - yum install -y sudo
     - cd recipes/qt/6.x.x
-    - conan create . qt/6.2.2@alazar/stable --build missing -s ${BUILD_TYPE} -o qt:shared=True
+    - CONAN_SYSREQUIRES_MODE=enabled conan create . qt/6.2.2@alazar/stable --build missing -s ${BUILD_TYPE} -o qt:shared=True
     - conan upload qt/6.2.2@alazar/stable -r ottawa
   parallel:
     matrix:
@@ -26,6 +30,7 @@ build:ubuntu20.04:
 build:windows:
   image: alazartech/vs2019:2.1.0
   script:
+    - conan remote remove bincrafters
     - cd recipes/qt/6.x.x
     - conan create . qt/6.2.2@alazar/stable --build missing -s ${BUILD_TYPE} -o qt:opengl=dynamic -o qt:shared=True
     - conan upload qt/6.2.2@alazar/stable -r ottawa
