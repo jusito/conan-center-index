@@ -1,5 +1,5 @@
 
-build:centos8:
+build:centos8: # GCC 8
   image: alazartech/centos8:2.1.0
   script:
     - conan remote remove bincrafters
@@ -13,7 +13,24 @@ build:centos8:
   tags:
     - docker
 
-build:ubuntu20.04:
+build:centos8-gcc10:
+  image: alazartech/centos8:2.1.0
+  script:
+    - dnf install -y gcc-toolset-10-gcc gcc-toolset-10-gcc-c++
+    - source /opt/rh/gcc-toolset-10/enable
+    - conan profile update settings.compiler.version=10 default
+    - conan remote remove bincrafters
+    - yum install -y sudo
+    - cd recipes/qt/6.x.x
+    - CONAN_SYSREQUIRES_MODE=enabled conan create . qt/6.2.2@alazar/stable --build missing -s ${BUILD_TYPE} -o qt:shared=True
+    - conan upload qt/6.2.2@alazar/stable -r ottawa
+  parallel:
+    matrix:
+      - BUILD_TYPE: ["build_type=Release", "build_type=Debug"]
+  tags:
+    - docker
+
+build:ubuntu20.04: # GCC 9
   image: alazartech/centos8:2.1.0
   script:
     - conan remote remove bincrafters
