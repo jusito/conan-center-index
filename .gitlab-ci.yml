@@ -22,7 +22,6 @@ build:centos8-gcc10:
 build:windows:
   image: alazartech/vs2019:2.1.0
   script:
-    - conan profile update settings.compiler.version=16.11 default
     - conan remote remove bincrafters
     - cd ${BUILD_DIR}
     - conan create . ${RECIPE} --build missing -s ${BUILD_TYPE} -o qt:opengl=dynamic -o qt:shared=True
