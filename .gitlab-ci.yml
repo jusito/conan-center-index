@@ -6,7 +6,7 @@ build:centos8: # GCC 8
     - yum install -y sudo
     - cd recipes/qt/6.x.x
     - CONAN_SYSREQUIRES_MODE=enabled conan create . qt/6.2.2@alazar/stable --build missing -s ${BUILD_TYPE} -o qt:shared=True
-    - conan upload qt/6.2.2@alazar/stable -r ottawa
+    - conan upload qt/6.2.2@alazar/stable -r ottawa --all
   parallel:
     matrix:
       - BUILD_TYPE: ["build_type=Release", "build_type=Debug"]
@@ -23,7 +23,7 @@ build:centos8-gcc10:
     - yum install -y sudo
     - cd recipes/qt/6.x.x
     - CONAN_SYSREQUIRES_MODE=enabled conan create . qt/6.2.2@alazar/stable --build missing -s ${BUILD_TYPE} -o qt:shared=True
-    - conan upload qt/6.2.2@alazar/stable -r ottawa
+    - conan upload qt/6.2.2@alazar/stable -r ottawa --all
   parallel:
     matrix:
       - BUILD_TYPE: ["build_type=Release", "build_type=Debug"]
@@ -37,7 +37,7 @@ build:ubuntu20.04: # GCC 9
     - yum install -y sudo
     - cd recipes/qt/6.x.x
     - CONAN_SYSREQUIRES_MODE=enabled conan create . qt/6.2.2@alazar/stable --build missing -s ${BUILD_TYPE} -o qt:shared=True
-    - conan upload qt/6.2.2@alazar/stable -r ottawa
+    - conan upload qt/6.2.2@alazar/stable -r ottawa --all
   parallel:
     matrix:
       - BUILD_TYPE: ["build_type=Release", "build_type=Debug"]
@@ -50,7 +50,7 @@ build:windows:
     - conan remote remove bincrafters
     - cd recipes/qt/6.x.x
     - conan create . qt/6.2.2@alazar/stable --build missing -s ${BUILD_TYPE} -o qt:opengl=dynamic -o qt:shared=True
-    - conan upload qt/6.2.2@alazar/stable -r ottawa
+    - conan upload qt/6.2.2@alazar/stable -r ottawa --all
   parallel:
     matrix:
       - BUILD_TYPE: ["build_type=Release", "build_type=Debug"]
