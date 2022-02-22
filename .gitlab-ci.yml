@@ -1,10 +1,21 @@
-qt:
+qt:win:
   image: alazartech/vs2019:2.1.0
   script:
     - cd recipes/qt/6.x.x
-    - conan create -o qt:shared=True                           . qt/6.2.1@alazar/stable
-    - conan create -o qt:shared=True -o qt:qttranslations=True . qt/6.2.1@alazar/stable
-    - conan upload -r ottawa --all --force qt/6.2.1@alazar/stable
+    - conan create -o qt:shared=True                           . qt/6.2.3@alazar/stable
+    - conan create -o qt:shared=True -o qt:qttranslations=True . qt/6.2.3@alazar/stable
+    - conan upload -r ottawa --all --force qt/6.2.3@alazar/stable
   stage: build
   tags:
     - docker-windows
+
+qt:ubuntu20:
+  image: alazartech/ubuntu20.04:2.1.0
+  script:
+    - cd recipes/qt/6.x.x
+    - conan create -o qt:shared=True                           . qt/6.2.3@alazar/stable
+    - conan create -o qt:shared=True -o qt:qttranslations=True . qt/6.2.3@alazar/stable
+    - conan upload -r ottawa --all --force qt/6.2.3@alazar/stable
+  stage: build
+  tags:
+    - docker
