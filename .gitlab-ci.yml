@@ -4,6 +4,7 @@ qt:win:
     - cd recipes/qt/6.x.x
     - conan create --build missing -o qt:shared=True                           . qt/6.2.3@alazar/stable
     - conan create --build missing -o qt:shared=True -o qt:qttranslations=True . qt/6.2.3@alazar/stable
+    - conan create --build missing -o qt:shared=True -o qt:opengl=dynamic      . qt/6.2.3@alazar/stable
     - conan upload -r ottawa --all --force qt/6.2.3@alazar/stable
   stage: build
   tags:
