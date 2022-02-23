@@ -1,6 +1,7 @@
 qt:win:
   image: alazartech/vs2019:2.1.0
   script:
+    - conan remote remove bincrafters # Not used anymore
     - cd recipes/qt/6.x.x
     - conan create --build missing ${OPTIONS} -s build_type=${BUILD_TYPE} . qt/6.2.3@alazar/stable
     - conan upload -r ottawa --all --force qt/6.2.3@alazar/stable
@@ -16,7 +17,7 @@ qt:ubuntu20:
   image: alazartech/ubuntu20.04:2.1.0
   script:
     - apt-get install -y sudo # Conan wants it
-    - conan remote remove bincrafters
+    - conan remote remove bincrafters # Not used anymore
     - cd recipes/qt/6.x.x
     - conan create --build missing ${OPTIONS} -s build_type=${BUILD_TYPE} . qt/6.2.3@alazar/stable
     - conan upload -r ottawa --all --force qt/6.2.3@alazar/stable
