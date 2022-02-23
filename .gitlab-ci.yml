@@ -13,6 +13,7 @@ qt:ubuntu20:
   image: alazartech/ubuntu20.04:2.1.0
   script:
     - apt-get install -y sudo # Conan wants it
+    - conan remote remove bincrafters
     - cd recipes/qt/6.x.x
     - conan create --build missing -o qt:shared=True                           . qt/6.2.3@alazar/stable
     - conan create --build missing -o qt:shared=True -o qt:qttranslations=True . qt/6.2.3@alazar/stable
