@@ -7,7 +7,7 @@ qt:win:
   parallel:
     matrix:
       - OPTIONS: ["-o qt:shared=True", "-o qt:shared=True -o  qt:qttranslations=True"]
-      - BUILD_TYPE: ["Release", "Debug"]
+        BUILD_TYPE: ["Release", "Debug"]
   stage: build
   tags:
     - docker-windows
@@ -23,7 +23,7 @@ qt:ubuntu20:
   parallel:
     matrix:
       - OPTIONS: ["-o qt:shared=True", "-o qt:shared=True -o  qt:qttranslations=True"]
-      - BUILD_TYPE: ["Release", "Debug"]
+        BUILD_TYPE: ["Release", "Debug"]
   stage: build
   tags:
     - docker
