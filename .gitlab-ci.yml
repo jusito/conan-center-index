@@ -4,9 +4,10 @@ qt:win:
     - cd recipes/qt/6.x.x
     - conan create --build missing ${OPTIONS} -s build_type=${BUILD_TYPE} . qt/6.2.3@alazar/stable
     - conan upload -r ottawa --all --force qt/6.2.3@alazar/stable
-  matrix:
-    - OPTIONS: ["-o qt:shared=True", "-o qt:shared=True -o  qt:qttranslations=True"]
-    - BUILD_TYPE: ["Release", "Debug"]
+  parallel:
+    matrix:
+      - OPTIONS: ["-o qt:shared=True", "-o qt:shared=True -o  qt:qttranslations=True"]
+      - BUILD_TYPE: ["Release", "Debug"]
   stage: build
   tags:
     - docker-windows
@@ -19,9 +20,10 @@ qt:ubuntu20:
     - cd recipes/qt/6.x.x
     - conan create --build missing ${OPTIONS} -s build_type=${BUILD_TYPE} . qt/6.2.3@alazar/stable
     - conan upload -r ottawa --all --force qt/6.2.3@alazar/stable
-  matrix:
-    - OPTIONS: ["-o qt:shared=True", "-o qt:shared=True -o  qt:qttranslations=True"]
-    - BUILD_TYPE: ["Release", "Debug"]
+  parallel:
+    matrix:
+      - OPTIONS: ["-o qt:shared=True", "-o qt:shared=True -o  qt:qttranslations=True"]
+      - BUILD_TYPE: ["Release", "Debug"]
   stage: build
   tags:
     - docker
