@@ -3,11 +3,11 @@ qt:win:
   script:
     - conan remote remove bincrafters # Not used anymore
     - cd recipes/qt/6.x.x
-    - conan create --build missing ${OPTIONS} -s build_type=${BUILD_TYPE} . qt/6.2.3@alazar/stable
+    - conan create --build missing -o qt:shared=True ${OPTION} -s build_type=${BUILD_TYPE} . qt/6.2.3@alazar/stable
     - conan upload -r ottawa --all --force qt/6.2.3@alazar/stable
   parallel:
     matrix:
-      - OPTIONS: ["-o qt:shared=True", "-o qt:shared=True -o  qt:qttranslations=True"]
+      - OPTION: ["", "-o qt:qttranslations=True"]
         BUILD_TYPE: ["Release", "Debug"]
   stage: build
   tags:
@@ -19,11 +19,11 @@ qt:ubuntu20:
     - apt-get install -y sudo # Conan wants it
     - conan remote remove bincrafters # Not used anymore
     - cd recipes/qt/6.x.x
-    - conan create --build missing ${OPTIONS} -s build_type=${BUILD_TYPE} . qt/6.2.3@alazar/stable
+    - conan create --build missing -o qt:shared=True ${OPTION} -s build_type=${BUILD_TYPE} . qt/6.2.3@alazar/stable
     - conan upload -r ottawa --all --force qt/6.2.3@alazar/stable
   parallel:
     matrix:
-      - OPTIONS: ["-o qt:shared=True", "-o qt:shared=True -o  qt:qttranslations=True"]
+      - OPTION: ["", "-o qt:qttranslations=True"]
         BUILD_TYPE: ["Release", "Debug"]
   stage: build
   tags:
