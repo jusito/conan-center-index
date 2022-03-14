@@ -1,14 +1,21 @@
+variables:
+  RECIPE: qt/6.2.3@alazar/stable
+
 qt:win:
   image: alazartech/vs2019:2.1.0
   script:
     - conan remote remove bincrafters # Not used anymore
     - cd recipes/qt/6.x.x
-    - conan create --build missing -o qt:shared=True ${OPTION} -s build_type=${BUILD_TYPE} . qt/6.2.3@alazar/stable
-    - conan upload -r ottawa --all --force qt/6.2.3@alazar/stable
+    - conan create --build missing             \
+          -o qt:shared=${SHARED}               \
+          -o qt:qttranslations=${TRANSLATIONS} \
+          -s build_type=${BUILD_TYPE} . ${RECIPE}
+    - conan upload -r ottawa --all --force ${RECIPE}
   parallel:
     matrix:
-      - OPTION: ["", "-o qt:qttranslations=True"]
-        BUILD_TYPE: ["Release", "Debug"]
+      - BUILD_TYPE: ["Release", "Debug"]
+        TRANSLATIONS: ["True", "False"]
+        SHARED: ["True"]
   stage: build
   tags:
     - docker-windows
@@ -19,12 +26,16 @@ qt:ubuntu20:
     - apt-get install -y sudo # Conan wants it
     - conan remote remove bincrafters # Not used anymore
     - cd recipes/qt/6.x.x
-    - conan create --build missing -o qt:shared=True ${OPTION} -s build_type=${BUILD_TYPE} . qt/6.2.3@alazar/stable
-    - conan upload -r ottawa --all --force qt/6.2.3@alazar/stable
+    - conan create --build missing             \
+          -o qt:shared=${SHARED}               \
+          -o qt:qttranslations=${TRANSLATIONS} \
+          -s build_type=${BUILD_TYPE} . ${RECIPE}
+    - conan upload -r ottawa --all --force ${RECIPE}
   parallel:
     matrix:
-      - OPTION: ["", "-o qt:qttranslations=True"]
-        BUILD_TYPE: ["Release", "Debug"]
+      - BUILD_TYPE: ["Release", "Debug"]
+        TRANSLATIONS: ["True", "False"]
+        SHARED: ["True"]
   stage: build
   tags:
     - docker
