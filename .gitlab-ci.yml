@@ -6,9 +6,9 @@ qt:win:
   script:
     - conan remote remove bincrafters # Not used anymore
     - cd recipes/qt/6.x.x
-    - conan create --build missing             \
-          -o qt:shared=${SHARED}               \
-          -o qt:qttranslations=${TRANSLATIONS} \
+    - conan create --build missing
+          -o qt:shared=${SHARED}
+          -o qt:qttranslations=${TRANSLATIONS}
           -s build_type=${BUILD_TYPE} . ${RECIPE}
     - conan upload -r ottawa --all --force ${RECIPE}
   parallel:
@@ -26,9 +26,9 @@ qt:ubuntu20:
     - apt-get install -y sudo # Conan wants it
     - conan remote remove bincrafters # Not used anymore
     - cd recipes/qt/6.x.x
-    - conan create --build missing             \
-          -o qt:shared=${SHARED}               \
-          -o qt:qttranslations=${TRANSLATIONS} \
+    - conan create --build missing
+          -o qt:shared=${SHARED}
+          -o qt:qttranslations=${TRANSLATIONS}
           -s build_type=${BUILD_TYPE} . ${RECIPE}
     - conan upload -r ottawa --all --force ${RECIPE}
   parallel:
