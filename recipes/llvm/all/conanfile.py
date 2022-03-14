@@ -1,7 +1,10 @@
-from conans import ConanFile, tools, CMake
-from conans.tools import Version
+import glob
+import os
+import shutil
+
+from conans import CMake, ConanFile, tools
 from conans.errors import ConanInvalidConfiguration
-import os, shutil, glob
+from conans.tools import Version
 
 projects = [
     'clang',
@@ -47,6 +50,7 @@ class Llvm(ConanFile):
         'fPIC': True
     }}
     generators = 'cmake_find_package'
+    short_paths = True
 
     @property
     def repo_folder(self):
