@@ -8,3 +8,13 @@ llvm:windows64:
   stage: build
   tags:
     - docker-windows-1809
+
+llvm:ubuntu2004:
+  image: alazartech/ubuntu20.04:2.1.0
+  script:
+    - cd recipes/llvm/all
+    - conan create . llvm/13.0.0@alazar/stable
+    - conan upload -r ottawa --all --force llvm/13.0.0@alazar/stable
+  stage: build
+  tags:
+    - docker
