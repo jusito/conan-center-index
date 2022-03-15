@@ -40,7 +40,6 @@ class Llvm(ConanFile):
 
     settings = 'os', 'arch', 'compiler', 'build_type'
 
-    no_copy_source = True
     _source_subfolder = 'source_subfolder'
 
     options = {**{ 'with_' + project : [True, False] for project in projects }, **{
