@@ -49,6 +49,7 @@ class Llvm(ConanFile):
     default_options = {**{ 'with_' + project : project in default_projects for project in projects }, **{
         'fPIC': True
     }}
+    exports_sources = ["patches/**"]
     generators = 'cmake_find_package'
     short_paths = True
 
@@ -86,6 +87,9 @@ class Llvm(ConanFile):
         return cmake
 
     def build(self):
+        for patch in self.conan_data.get("patches", {}).get(self.version, []):
+            tools.patch(**patch)
+
         cmake = self._cmake_configure()
         cmake.build()
 

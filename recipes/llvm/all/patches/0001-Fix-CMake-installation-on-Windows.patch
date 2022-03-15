@@ -1,0 +1,25 @@
+From 4cc9018b3d4ecd274096609331e31b0a5168a6ff Mon Sep 17 00:00:00 2001
+From: Romain Deterre <romain.deterre@gmail.com>
+Date: Tue, 15 Mar 2022 10:55:25 -0400
+Subject: [PATCH] Fix CMake installation on Windows
+
+See https://stackoverflow.com/a/62662899 for details
+---
+ compiler-rt/cmake/Modules/AddCompilerRT.cmake | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/compiler-rt/cmake/Modules/AddCompilerRT.cmake b/compiler-rt/cmake/Modules/AddCompilerRT.cmake
+index 062955c70533..92dfd848fbb5 100644
+--- a/compiler-rt/cmake/Modules/AddCompilerRT.cmake
++++ b/compiler-rt/cmake/Modules/AddCompilerRT.cmake
+@@ -9,6 +9,7 @@ function(set_target_output_directories target output_dir)
+   # set 'RUNTIME_OUTPUT_DIRECTORY_${CONF}':
+   # RUNTIME_OUTPUT_DIRECTORY_DEBUG, RUNTIME_OUTPUT_DIRECTORY_RELEASE, ...
+   if(CMAKE_CONFIGURATION_TYPES)
++    string(REGEX REPLACE "\\$\\(Configuration\\)" "$<CONFIG>" output_dir "${output_dir}")
+     foreach(build_mode ${CMAKE_CONFIGURATION_TYPES})
+       string(TOUPPER "${build_mode}" CONFIG_SUFFIX)
+       set_target_properties("${target}" PROPERTIES
+-- 
+2.35.1
+
