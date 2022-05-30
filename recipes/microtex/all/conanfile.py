@@ -16,6 +16,9 @@ class MicroTexConan(ConanFile):
         "tinyxml2/9.0.0",
         "qt/6.2.3",
     )
+    default_options = {
+        "qt:shared": "True"
+    }
     generators = "cmake", "cmake_find_package", "cmake_find_package_multi"
     settings = "os", "arch", "compiler", "build_type"
 
@@ -42,6 +45,10 @@ class MicroTexConan(ConanFile):
         cmake.definitions["QT"] = "ON"
         cmake.configure()
         cmake.build()
+
+    def imports(self):
+        self.copy("*.dll", dst="bin/platforms", src="bin/archdatadir/plugins/platforms")
+        self.copy("glib*.dll", dst="bin", src="bin")
 
 
     def package(self):
