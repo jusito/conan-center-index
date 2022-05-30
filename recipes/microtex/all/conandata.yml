@@ -1,0 +1,9 @@
+sources:
+  "20210617":
+    url:
+      - "https://github.com/NanoMichael/MicroTeX/archive/dc32540664276a00805b21a0fb5cd6418bacdb54.zip"
+    sha256: "f70e41c282a0a9ea83b3686c5f2c471952a2071d3f8c3a8230939792d1f89860"
+patches:
+  "20210617":
+    - patch_file: "patches/0001-fix-cmake-tinyxml.patch"
+      base_path: "source_subfolder"

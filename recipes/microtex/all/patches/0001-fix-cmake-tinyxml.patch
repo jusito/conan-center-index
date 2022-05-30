@@ -1,0 +1,30 @@
+From 5ac95fa9142eb4b6c505d0ccdcc74bf4cec6757b Mon Sep 17 00:00:00 2001
+From: Romain Deterre <romain@alazartech.com>
+Date: Mon, 30 May 2022 14:55:04 -0400
+Subject: [PATCH] fix-cmake-tinyxml
+
+---
+ CMakeLists.txt | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9654360..f5609ae 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -43,11 +43,10 @@ endif ()
+ 
+ file(COPY res DESTINATION .)
+ if (MSVC)
+-    find_package(tinyxml2 CONFIG REQUIRED)
++    find_package(tinyxml2 REQUIRED)
+     target_link_libraries(LaTeX PRIVATE tinyxml2::tinyxml2)
+ else ()
+-    find_package(PkgConfig REQUIRED)
+-    pkg_check_modules(tinyxml2 REQUIRED IMPORTED_TARGET tinyxml2)
++    find_package(tinyxml2 REQUIRED)
+     target_link_libraries(LaTeX PRIVATE tinyxml2)
+ endif ()
+ 
+-- 
+2.32.1 (Apple Git-133)
+
