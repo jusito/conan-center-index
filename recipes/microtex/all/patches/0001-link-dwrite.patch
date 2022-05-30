@@ -1,0 +1,24 @@
+From 84d729ad2ef8079fd8b882a3b3d0275d6b01e97e Mon Sep 17 00:00:00 2001
+From: Romain Deterre <romain@alazartech.com>
+Date: Mon, 30 May 2022 15:20:40 -0400
+Subject: [PATCH] link dwrite
+
+---
+ CMakeLists.txt | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f5609ae..7ccfc52 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -45,6 +45,7 @@ file(COPY res DESTINATION .)
+ if (MSVC)
+     find_package(tinyxml2 REQUIRED)
+     target_link_libraries(LaTeX PRIVATE tinyxml2::tinyxml2)
++    target_link_libraries(LaTeX PRIVATE DWrite)
+ else ()
+     find_package(tinyxml2 REQUIRED)
+     target_link_libraries(LaTeX PRIVATE tinyxml2)
+-- 
+2.32.1 (Apple Git-133)
+
