@@ -1,0 +1,33 @@
+variables:
+  RECIPE_MICROTEX: microtex/20210617@alazar/stable
+  CONAN_SYSREQUIRES_MODE: enabled
+
+qt:win:
+  image: alazartech/vs2019:2.2.0
+  script:
+    - python -m pip install conan==1.47
+    - cd recipes/microtex/all
+    - conan create --build missing
+          -s build_type=${BUILD_TYPE} . ${RECIPE_MICROTEX}
+    - conan upload -r ottawa --all --force ${RECIPE_MICROTEX}
+  parallel:
+    matrix:
+      - BUILD_TYPE: ["Release", "Debug"]
+  stage: build
+  tags:
+    - docker-windows
+
+qt:win:
+  image: alazartech/ubuntu20.04:2.2.0
+  script:
+    - python -m pip install conan==1.47
+    - cd recipes/microtex/all
+    - conan create --build missing
+          -s build_type=${BUILD_TYPE} . ${RECIPE_MICROTEX}
+    - conan upload -r ottawa --all --force ${RECIPE_MICROTEX}
+  parallel:
+    matrix:
+      - BUILD_TYPE: ["Release", "Debug"]
+  stage: build
+  tags:
+    - docker

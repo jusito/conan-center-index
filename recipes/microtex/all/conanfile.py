@@ -52,15 +52,16 @@ class MicroTexConan(ConanFile):
 
 
     def package(self):
-        self.copy("DOC/License.txt", src="", dst="licenses")
-        self.copy("DOC/unRarLicense.txt", src="", dst="licenses")
-        if self.settings.os == "Windows":
-            self.copy("*.exe", src="CPP/7zip", dst="bin", keep_path=False)
-            self.copy("*.dll", src="CPP/7zip", dst="bin", keep_path=False)
-
-        # TODO: Package the libraries: binaries and headers (add the rest of settings)
+        self.copy("*.dll", dst="bin", src="bin", keep_path=False)
+        self.copy("*.lib", dst="lib", src="lib", keep_path=False)
+        self.copy("*.so*", dst="lib", keep_path=False)
+        self.copy("*.a", dst="lib", keep_path=False)
+        self.copy("*.h", dst="include", src="{}/src".format(self._source_subfolder))
+        self.copy("*.ttf", dst="res", src="{}/res".format(self._source_subfolder))
 
     def package_info(self):
         bin_path = os.path.join(self.package_folder, "bin")
         self.output.info("Appending PATH environment variable: {}".format(bin_path))
         self.env_info.path.append(bin_path)
+        self.cpp_info.libs = ["LaTeX"]
+        self.cpp_info.defines = ["BUILD_QT"]
