@@ -557,6 +557,7 @@ class Llvm(ConanFile):
         external_targets = {
             'libffi::libffi': 'ffi',
             'ZLIB::ZLIB': 'z',
+            'zstd::zstdlib': 'zstd',
             'Iconv::Iconv': 'iconv',
             'libxml2::libxml2': 'xml2',
             'pthread': 'pthread',
@@ -702,6 +703,10 @@ class Llvm(ConanFile):
             if not 'z' in components['LLVMSupport']:
                 components['LLVMSupport'].append('z')
 
+        if self.options.get_safe('with_zstd', False):
+            if not 'zstd' in components['LLVMSupport']:
+                components['LLVMSupport'].append('zstd')
+
         # fix: ERROR: llvm/14.0.6@...: Required package 'libxml2' not in component 'requires'
         xml2_linking = ["LLVMWindowsManifest", "lldbHost", "c-index-test"]
         report_xml2_issue = self.options.with_xml2
@@ -750,6 +755,7 @@ class Llvm(ConanFile):
         external_targets = {
             'ffi': 'libffi::libffi',
             'z': 'zlib::zlib',
+            'zstd': 'zstd::zstdlib',
             'xml2': 'libxml2::libxml2',
             'iconv': 'Iconv::Iconv',
         }
