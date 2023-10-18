@@ -1,5 +1,6 @@
 from conans import ConanFile, CMake, tools
 import re
+import os
 
 
 class TestPackageConan(ConanFile):
@@ -29,4 +30,5 @@ class TestPackageConan(ConanFile):
 
     def test(self):
         if not tools.cross_building(self.settings):
-            self.run("./test_package")
+            bin_path = os.path.join(os.getcwd(), "test_package")
+            self.run(bin_path, env="conanrun")
