@@ -19,7 +19,8 @@ from conan.tools.microsoft import is_msvc, msvc_runtime_flag
 from conan.tools.scm import Version
 
 import json
-import os
+from os import getenv
+from os.path import join
 from pathlib import Path
 import re
 import textwrap
@@ -38,7 +39,6 @@ LLVM_TARGETS = {
     "BPF",
     "Hexagon",
     "Lanai",
-    "LoongArch",
     "Mips",
     "MSP430",
     "NVPTX",
@@ -46,7 +46,6 @@ LLVM_TARGETS = {
     "RISCV",
     "Sparc",
     "SystemZ",
-    "VE",
     "WebAssembly",
     "X86",
     "XCore"
@@ -87,6 +86,7 @@ class LLVMCoreConan(ConanFile):
             "Address;Undefined",
             "None"
         ],
+        "with_curl": [True, False],
         "with_ffi": [True, False],
         "with_libedit": [True, False],
         "with_terminfo": [True, False],
@@ -108,11 +108,12 @@ class LLVMCoreConan(ConanFile):
         "expensive_checks": False,
         "use_perf": False,
         "use_sanitizer": "None",
+        "with_curl": True,
         "with_libedit": True,
         "with_ffi": False,
         "with_terminfo": False,  # differs from LLVM default
         "with_xml2": True,
-        "with_z3": True,
+        "with_z3": True, # not default
         "with_zlib": True,
     }
 
@@ -138,6 +139,10 @@ class LLVMCoreConan(ConanFile):
             del self.options.fPIC
             del self.options.with_libedit  # not supported on windows
 
+        release = Version(self.version).major
+        if release < 14:
+            del self.options.with_curl
+
     def configure(self):
         if self.options.shared:
             self.options.rm_safe("fPIC")
@@ -147,7 +152,8 @@ class LLVMCoreConan(ConanFile):
 
     def requirements(self):
         if self.options.with_ffi:
-            self.requires("libffi/3.4.4")
+            # no version requirement in llvm 11-17
+            self.requires("libffi/[>=3.4.4 <4.0.0]")
         if self.options.get_safe("with_libedit"):
             self.requires("editline/3.1")
         if self.options.with_zlib:
@@ -155,7 +161,12 @@ class LLVMCoreConan(ConanFile):
         if self.options.with_xml2:
             self.requires("libxml2/[>=2.12.5 <3]")
         if self.options.with_z3:
-            self.requires("z3/4.13.0")
+            # llvm 11-17: requires min 4.7.1
+            self.requires('z3/[>=4.7.1 <5.0.0]')
+
+        if Version(self.version).major >= 14 and self.options.with_curl:
+            # no version requirement in llvm 14-17
+            self.requires('libcurl/[>=7.76.0 <9.0.0]')
 
     def build_requirements(self):
         self.tool_requires("ninja/[>=1.10.2 <2]")
@@ -192,17 +203,22 @@ class LLVMCoreConan(ConanFile):
             raise ConanInvalidConfiguration("Cross compilation is not supported. Contributions are welcome!")
 
     def validate_build(self):
-        if os.getenv("CONAN_CENTER_BUILD_SERVICE") and self.settings.build_type == "Debug":
+        if getenv("CONAN_CENTER_BUILD_SERVICE") and self.settings.build_type == "Debug":
             if self.settings.os == "Linux":
                 raise ConanInvalidConfiguration("Debug build is not supported on CCI due to resource limitations")
             elif self.options.shared:
                 raise ConanInvalidConfiguration("Shared Debug build is not supported on CCI due to resource limitations")
 
     def source(self):
-        get(self, **self.conan_data["sources"][self.version], strip_root=True)
+        get(self, **self.conan_data["sources"][self.version])
+
+        llvm_folder=f"llvm-{self.version}.src"
+        rename(self, "cmake/Modules", "cmake/modules")
+        copy(self, pattern="*", src=llvm_folder, dst=".")
+        rmdir(self, llvm_folder)
 
     def _apply_resource_limits(self, cmake_definitions):
-        if os.getenv("CONAN_CENTER_BUILD_SERVICE"):
+        if getenv("CONAN_CENTER_BUILD_SERVICE"):
             self.output.info("Applying CCI Resource Limits")
             default_ram_per_compile_job = 16384
             default_ram_per_link_job = 2048
@@ -224,13 +240,19 @@ class LLVMCoreConan(ConanFile):
 
     @property
     def _all_targets(self):
-        targets = LLVM_TARGETS if Version(self.version) >= 14 else LLVM_TARGETS - {"LoongArch", "VE"}
+        targets = LLVM_TARGETS
+        ver = Version(self.version).major
+        if ver >= 14:
+            targets.add("VE")
+        if ver >= 15:
+            targets.add("LoongArch")
         return ";".join(targets)
 
     def generate(self):
         tc = CMakeToolchain(self, generator="Ninja")
         # https://releases.llvm.org/12.0.0/docs/CMake.html
         # https://releases.llvm.org/13.0.0/docs/CMake.html
+        # https://releases.llvm.org/14.0.0/docs/CMake.html
         cmake_variables = {
             # Enables LLVM to find conan libraries during try_compile
             "CMAKE_TRY_COMPILE_CONFIGURATION": str(self.settings.build_type),
@@ -243,6 +265,7 @@ class LLVMCoreConan(ConanFile):
             "LLVM_LINK_LLVM_DYLIB": self.options.shared,
             "LLVM_DYLIB_COMPONENTS": self.options.components,
             "LLVM_ABI_BREAKING_CHECKS": "WITH_ASSERTS",
+            "LLVM_INCLUDE_BENCHMARKS": False,
             "LLVM_INCLUDE_TOOLS": True,
             "LLVM_INCLUDE_EXAMPLES": False,
             "LLVM_INCLUDE_TESTS": False,
@@ -254,8 +277,9 @@ class LLVMCoreConan(ConanFile):
             "LLVM_STATIC_LINK_CXX_STDLIB": self.options.static_stdlib,
             "LLVM_ENABLE_UNWIND_TABLES": self.options.unwind_tables,
             "LLVM_ENABLE_EXPENSIVE_CHECKS": self.options.expensive_checks,
-            "LLVM_ENABLE_ASSERTIONS": str(self.settings.build_type),
+            "LLVM_ENABLE_ASSERTIONS": str(self.settings.build_type) == 'Debug',
             "LLVM_USE_PERF": self.options.use_perf,
+            'LLVM_ENABLE_CURL': 'FORCE_ON' if self.options.get_safe('with_curl', False) else False,
             "LLVM_ENABLE_LIBEDIT": self.options.get_safe("with_libedit", False),
             "LLVM_ENABLE_Z3_SOLVER": self.options.with_z3,
             "LLVM_ENABLE_FFI": self.options.with_ffi,
@@ -307,9 +331,11 @@ class LLVMCoreConan(ConanFile):
     def _update_component_dependencies(self, components):
         def _sanitized_components(deps_list):
             match_genex = re.compile(r"""\\\$<LINK_ONLY:(.+)>""")
+            # CMake Target package::component -> Conan package::component
             replacements = {
                 "LibXml2::LibXml2": "libxml2::libxml2",
-                "ZLIB::ZLIB": "zlib::zlib"
+                "ZLIB::ZLIB": "zlib::zlib",
+                "CURL::libcurl": "libcurl::libcurl"
             }
             for dep in deps_list.split(";"):
                 match = match_genex.search(dep)
@@ -433,7 +459,12 @@ class LLVMCoreConan(ConanFile):
 
         cmake_folder = self._package_folder_path / "lib" / "cmake" / "llvm"
         cmake_folder_posix = cmake_folder.as_posix()
-        rm(self, "LLVMConfig.cmake", cmake_folder_posix)
+        # Variables from this file are expected by other LLVM packages
+        llvm_config_original = join(cmake_folder_posix, "LLVMConfig.original.cmake")
+        rename(self, join(cmake_folder_posix, "LLVMConfig.cmake"), llvm_config_original)
+        # don't include LLVMExports.cmake / LLVM-Config.cmake
+        replace_in_file(self, llvm_config_original, "include(", "#include(")
+
         rm(self, "LLVMExports*", cmake_folder_posix)
         rm(self, "Find*", cmake_folder_posix)
         rm(self, "*.pdb", (self._package_folder_path / "lib").as_posix())
