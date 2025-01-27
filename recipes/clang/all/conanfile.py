@@ -236,9 +236,9 @@ class ClangConan(ConanFile):
         self._create_cmake_build_module(package_folder / self._build_module_file)
 
         cmake_folder = package_folder / self._cmake_module_path
-        # rename(self, "ClangConfig*", cmake_folder)
-        # rm(self, "ClangTargets*", cmake_folder)
-        # rmdir(self, package_folder / "share")
+        rm(self, "ClangConfig*", cmake_folder)
+        rm(self, "ClangTargets*", cmake_folder)
+        rmdir(self, package_folder / "share")
 
     def package_info(self):
         def _add_no_rtti_flag(component):

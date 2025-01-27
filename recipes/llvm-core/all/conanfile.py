@@ -151,22 +151,21 @@ class LLVMCoreConan(ConanFile):
         cmake_layout(self, src_folder="src")
 
     def requirements(self):
+        # min version taken from llvm < conancenter v2 min < working
         if self.options.with_ffi:
-            # no version requirement in llvm 11-17
-            self.requires("libffi/[>=3.4.4 <4.0.0]")
+            self.requires("libffi/[>=3.3 <4]") # no version required llvm 11-19
         if self.options.get_safe("with_libedit"):
-            self.requires("editline/3.1")
+            self.requires("editline/3.1") # no version required llvm 11-19
         if self.options.with_zlib:
-            self.requires("zlib/[>=1.2.11 <2]")
+            self.requires("zlib/[>=1.2.11 <2]") # no version required llvm 11-19
         if self.options.with_xml2:
-            self.requires("libxml2/[>=2.12.5 <3]")
+            self.requires("libxml2/[>=2.9.10 <3]") # no version required llvm 11-19
         if self.options.with_z3:
-            # llvm 11-17: requires min 4.7.1
-            self.requires('z3/[>=4.7.1 <5.0.0]')
-
-        if Version(self.version).major >= 14 and self.options.with_curl:
-            # no version requirement in llvm 14-17
-            self.requires('libcurl/[>=7.76.0 <9.0.0]')
+            self.requires("z3/[>=4.9.1 <5]") # llvm 11-18 4.8.9, 19 4.8.9
+        if self.options.get_safe("with_curl"):
+            self.requires('libcurl/[>=7.78.0 <9]') # no version requirement in llvm 14-19
+        if self.options.get_safe("with_zstd"):
+            self.requires("zstd/[>=1.4.3 <2]") # no version required llvm 15-19, <1.4.3 doesn't work
 
     def build_requirements(self):
         self.tool_requires("ninja/[>=1.10.2 <2]")
